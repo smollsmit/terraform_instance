@@ -1,6 +1,38 @@
+resource "google_compute_firewall" "allow-web-from-all-in" {
+    name    = "${var.company}-${var.project}-allow-web-from-all-in"
+    network = "${google_compute_network.vpc.name}"
+    allow {
+        protocol = "tcp"
+        ports    = ["80","443"]
+    }
+    source_ranges = ["0.0.0.0/0"]
+    target_tags = ["allow-web-from-all-in"] 
+}
 
-resource "google_compute_firewall" "allow-internal" {
-    name    = "${var.company}-${var.project}-fw-allow-internal"
+resource "google_compute_firewall" "allow-ssh-from-all-in" {
+    name    = "${var.company}-${var.project}-allow-ssh-from-all-in"
+    network = "${google_compute_network.vpc.name}"
+    allow {
+        protocol = "tcp"
+        ports    = ["22"]
+    }
+    source_ranges = ["0.0.0.0/0"]
+    target_tags = ["allow-ssh-from-all-in"]
+}
+
+resource "google_compute_firewall" "allow-all-out" {
+    name    = "${var.company}-${var.project}-allow-all-out"
+    network = "${google_compute_network.vpc.name}"
+
+    allow {
+        protocol = "all"
+    }
+
+    source_ranges = ["0.0.0.0/0"]
+    target_tags = ["allow-all-out"]
+}
+resource "google_compute_firewall" "allow-all-from-internal-in" {
+    name    = "${var.company}-${var.project}-allow-all-from-internal-in"
     network = "${google_compute_network.vpc.name}"
     allow {
         protocol = "icmp"
@@ -16,39 +48,6 @@ resource "google_compute_firewall" "allow-internal" {
     source_ranges = [
       "${var.frontend_subnet}",
       "${var.backend_subnet}"
-      #"0.0.0.0/0"
     ]
-}
-
-resource "google_compute_firewall" "allow-web" {
-    name    = "${var.company}-${var.project}-fw-allow-web"
-    network = "${google_compute_network.vpc.name}"
-    allow {
-        protocol = "tcp"
-        ports    = ["80","443"]
-    }
-    source_ranges = ["0.0.0.0/0"]
-    target_tags = ["web"] 
-}
-
-resource "google_compute_firewall" "allow-ssh" {
-    name    = "${var.company}-${var.project}-fw-allow-ssh"
-    network = "${google_compute_network.vpc.name}"
-    allow {
-        protocol = "tcp"
-        ports    = ["22"]
-    }
-    source_ranges = ["0.0.0.0/0"]
-    target_tags = ["ssh"]
-}
-
-resource "google_compute_firewall" "frontend-allow-outbound" {
-    name    = "web-allow-outbound"
-    network = "${google_compute_network.vpc.name}"
-
-    allow {
-        protocol = "all"
-    }
-
-    source_ranges = ["0.0.0.0/0"]
+    target_tags = ["allow-all-from-internal-in"] 
 }
